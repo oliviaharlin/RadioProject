@@ -38,7 +38,6 @@ public class ProgramTask extends RadioTask {
     public ProgramTask(HttpURLConnection connection, URL url, Consumer<ArrayList<Program>> callback){
         super(connection, url);
         this.callback = callback;
-
     }
 
     /**
@@ -59,20 +58,22 @@ public class ProgramTask extends RadioTask {
             allPrograms(programArray);
 
             // sort out programs within time range (6h before - 12 after) and return through callback
-            callback.accept(programsWithinTimeRange());
+            ArrayList<Program> returnList = programsWithinTimeRange();
+
+            callback.accept(returnList);
 
         } catch (JSONException | MalformedURLException | URISyntaxException e) {
             System.out.println(e);
+            try {
+                // create temporary objects for indicating that no programs exist
+                newList.add(new Program("tomt", "test", "2022-02-02T00:00:00Z", "2022-02-02T00:00:00Z", "https://upload.wikimedia.org/wikipedia/commons/1/11/Blue_question_mark_icon.svg"));
+                callback.accept(newList);
+
+            } catch (URISyntaxException | MalformedURLException ex) {
+                System.out.println(ex);
+            }
         }
 
-        try {
-            // create temporary objects for indicating that no programs exist
-            newList.add(new Program("tomt", "test", "2022-02-02T00:00:00Z", "2022-02-02T00:00:00Z", "https://upload.wikimedia.org/wikipedia/commons/1/11/Blue_question_mark_icon.svg"));
-            callback.accept(newList);
-
-        } catch (URISyntaxException | MalformedURLException  e) {
-            System.out.println(e);
-        }
     }
 
 

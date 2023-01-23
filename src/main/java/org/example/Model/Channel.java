@@ -26,7 +26,7 @@ public class Channel {
     private String[][] data;
     private URL channelURL;
     private LocalDate today = LocalDate.now();
-    private ArrayList<URL> images;
+    private int i = 0;
 
     /**
      * Class constructor. Creates a new radio channel and sets request URL.
@@ -55,7 +55,7 @@ public class Channel {
      * an arraylist.
      * @throws IOException
      */
-    public void setPrograms() throws IOException{
+    public synchronized void setPrograms() throws IOException, InterruptedException {
 
         HttpURLConnection programConnection = (HttpURLConnection) channelURL.openConnection();
         programConnection.setRequestMethod("GET");
@@ -65,19 +65,20 @@ public class Channel {
         Timer timer = new Timer();
 
         // fetch programs from API once every hour
-        timer.schedule(programTask = new ProgramTask(programConnection, channelURL, (c)-> {
+        timer.schedule(programTask = new ProgramTask(programConnection, channelURL, (c) -> {
             programs = c;
-        }), 0, 3600000);
+        }), 0, 10000); // set to 3600000
 
-        int i = 0;
 
         // wait for programs to be fetched...
         while (programs.size() == 0){
-            System.out.println(programs.size());
+            System.out.println("loading...");
         }
 
+        System.out.println("Done fetching programs!");
+
+        createProgramTable(programs);
         fetchedPrograms = true;
-        createProgramTable();
     }
 
     /**
@@ -91,11 +92,13 @@ public class Channel {
 
     /**
      * Creates program table to be displayed in GUI.
+     * @param programs - An array list containing all programs
      */
-    private void createProgramTable(){
+    private synchronized void createProgramTable(ArrayList<Program> programs){
 
+        String test = programs.get(0).getTitle();
         // create two-dimensional string array containing the program name and the times
-        if(!programs.get(0).getTitle().equals("tomt")) {
+        if(!(test.equals("tomt"))) {
 
             data = new String[programs.size()][3];
 

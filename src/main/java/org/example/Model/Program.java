@@ -3,7 +3,9 @@ package org.example.Model;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
@@ -39,9 +41,9 @@ public class Program {
         this.image = new URL(image);
 
         // convert time strings to localDateTime format
-        ZonedDateTime temp1 = ZonedDateTime.parse(startTimeString);
+        ZonedDateTime temp1 = Instant.parse(startTimeString).atZone(ZoneId.systemDefault());
         startTime = temp1.toLocalDateTime();
-        ZonedDateTime temp2 = ZonedDateTime.parse(endTimeString);
+        ZonedDateTime temp2 = Instant.parse(endTimeString).atZone(ZoneId.systemDefault());
         endTime = temp2.toLocalDateTime();
     }
 
